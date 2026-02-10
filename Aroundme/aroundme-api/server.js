@@ -105,6 +105,48 @@ app.get("/api/places/by-address", async (req, res) => {
   }
 });
 
+// 🔎 Recherche générale (q)
+app.get("/api/places/search", async (req, res) => {
+  try {
+    const db = app.locals.db;
+    if (!db) return res.status(503).json({ error: "DB not ready" });
+
+    const { q, limit = 50, page = 1 } = req.query;
+    if (!q || String(q).trim() === "") {
+      return res.status(400).json({ error: "Paramètre q requis" });
+    }
+
+    const term = String(q).trim();
+    const regex = { $regex: term, $options: "i" };
+
+    // Rechercher dans plusieurs champs pertinents
+    const filter = {
+      $or: [
+        { "properties.name": regex },
+        { "properties.amenity": regex },
+        { "properties.address": regex },
+        { "properties.phone": regex },
+        { "properties.shop": regex },
+        { "properties.brand": regex },
+        { "properties.operator": regex },
+        { "properties['addr:postcode']": regex },
+        { "properties['addr:district']": regex }
+      ]
+    };
+
+    const places = await db.collection("places")
+      .find(filter)
+      .skip((Number(page) - 1) * Number(limit))
+      .limit(Math.min(Number(limit), 200))
+      .toArray();
+
+    res.json({ count: places.length, data: places });
+  } catch (err) {
+    console.error("❌ API search error", err);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+});
+
 
 // 🚀 Start server
 app.listen(3000, () => {
