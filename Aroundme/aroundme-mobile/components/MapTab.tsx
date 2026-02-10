@@ -26,8 +26,8 @@ export default function MapTab({ places, lat, lng }: MapTabProps) {
         {
           latitude: lat,
           longitude: lng,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05,
+          latitudeDelta: 0.004,
+          longitudeDelta: 0.004,
         },
         1000
       );

@@ -18,7 +18,10 @@ export default function HomeScreen() {
   const fetchPlaces = async () => {
     setLoading(true);
     try {
-      const url = `${API_URL}/api/places/nearby?lat=${lat}&lng=${lng}&radius=1000&limit=20`;
+      // Convertir les virgules en points pour les coordonnées
+      const normalizedLat = lat.replace(",", ".");
+      const normalizedLng = lng.replace(",", ".");
+      const url = `${API_URL}/api/places/nearby?lat=${normalizedLat}&lng=${normalizedLng}&radius=1000&limit=20`;
       console.log("CALL API:", url);
 
       const res = await fetch(url);
@@ -58,7 +61,9 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>AroundMe (Simulation)</Text>
+      <View style={{ height: 50 }} />
+
+      <Text style={styles.title}>AroundMe</Text>
 
       <Text>Latitude :</Text>
       <TextInput
@@ -81,13 +86,13 @@ export default function HomeScreen() {
       />
 
       <Button
-        title="Me localiser"
+        title="Préremplir avec ma position actuelle (simulée)"
         onPress={simulateMyLocation}
         color="#6a5acd"
       />
       <View style={{ height: 8 }} />
       <Button
-        title="Rechercher les lieux proches"
+        title="Lancer la recherche de lieux à proximité"
         onPress={() => fetchPlaces()}
         color="#2196F3"
       />
@@ -100,8 +105,11 @@ export default function HomeScreen() {
           title="Voir sur la carte"
           color="#6a5acd"
           onPress={() => router.push({
-            pathname: "./MapViewScreen",
-            params: { lat, lng }
+            pathname: "./map",
+            params: { 
+              lat: lat.replace(",", "."),
+              lng: lng.replace(",", ".")
+            }
           })}
         />
       )}
