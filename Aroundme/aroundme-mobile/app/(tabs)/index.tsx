@@ -53,10 +53,16 @@ export default function HomeScreen() {
 
   // --- simulation de géolocalisation PC ---
   const simulateMyLocation = () => {
-    const simulatedLat = "48.8566";
-    const simulatedLng = "2.3522";
-    setLat(simulatedLat);
-    setLng(simulatedLng);
+    // Coordonnées limites de Paris (bounding box)
+    const parisLat = { min: 48.8155, max: 48.9021 };
+    const parisLng = { min: 2.2242, max: 2.4699 };
+
+    // Générer une position aléatoire
+    const randomLat = (parisLat.min + Math.random() * (parisLat.max - parisLat.min)).toFixed(4);
+    const randomLng = (parisLng.min + Math.random() * (parisLng.max - parisLng.min)).toFixed(4);
+
+    setLat(randomLat);
+    setLng(randomLng);
   };
 
   return (
@@ -86,7 +92,7 @@ export default function HomeScreen() {
       />
 
       <Button
-        title="Exemple de position simulée (Paris)"
+        title="Position Aléatoire (Paris)"
         onPress={simulateMyLocation}
         color="#6a5acd"
       />
@@ -99,6 +105,10 @@ export default function HomeScreen() {
       <View style={{ height: 8 }} />
 
       {loading && <Text>Chargement...</Text>}
+
+      {!loading && lat && lng && places.length === 0 && (
+        <Text style={styles.noResults}>Aucun résultat trouvé à cette position</Text>
+      )}
 
       {contextPlaces.length > 0 && (
         <Button
@@ -162,4 +172,5 @@ const styles = StyleSheet.create({
   title: { fontSize: 22, marginBottom: 10 },
   input: { borderWidth: 1, borderColor: "#ccc", padding: 8, marginBottom: 10 },
   item: { padding: 10, borderBottomWidth: 1, borderBottomColor: "#eee" },
+  noResults: { textAlign: "center", color: "#999", marginVertical: 24, fontSize: 16 },
 });

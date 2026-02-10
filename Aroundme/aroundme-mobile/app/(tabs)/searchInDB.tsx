@@ -113,6 +113,10 @@ export default function SearchScreen() {
         <Text style={styles.resultCount}>{results.length} résultat{results.length > 1 ? "s" : ""}</Text>
       )}
 
+      {!loading && query && results.length === 0 && (
+        <Text style={styles.noResults}>Aucun résultat trouvé pour "{query}"</Text>
+      )}
+
       <FlatList
         data={results}
         keyExtractor={(item) => item._id?.toString() || item.id?.toString()}
@@ -172,6 +176,7 @@ const styles = StyleSheet.create({
   },
   loading: { textAlign: "center", color: "#2196F3", marginVertical: 12 },
   resultCount: { fontSize: 14, color: "#666", marginVertical: 8, fontWeight: "600" },
+  noResults: { textAlign: "center", color: "#999", marginVertical: 24, fontSize: 16 },
   item: { padding: 12, marginVertical: 8, borderLeftWidth: 4, borderLeftColor: "#6a5acd", backgroundColor: "#f5f5f5", borderRadius: 6 },
   meta: { fontSize: 13, color: "#666", marginBottom: 4 },
 });
