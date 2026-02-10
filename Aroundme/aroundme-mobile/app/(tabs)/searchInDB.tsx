@@ -2,6 +2,7 @@ import { View, Text, TextInput, Button, FlatList, StyleSheet, ScrollView } from 
 import { useState } from "react";
 import { usePlaces } from "@/context/PlacesContext";
 import { useRouter } from "expo-router";
+import { IconSymbol } from "@/components/ui/icon-symbol";
 
 const API_URL = "http://10.162.130.165:3000";
 
@@ -58,6 +59,35 @@ export default function SearchScreen() {
     router.push({ pathname: "./map", params: { lat: latRaw, lng: lngRaw } });
   };
 
+  const searchNearby = async (place: any) => {
+    const coords = place.geometry?.coordinates || [];
+    if (coords.length !== 2) {
+      alert("Coordonnées absentes pour ce lieu.");
+      return;
+    }
+
+    const latRaw = String(coords[1]).replace(",", ".");
+    const lngRaw = String(coords[0]).replace(",", ".");
+
+    setLoading(true);
+    try {
+      const url = `${API_URL}/api/places/nearby?lat=${latRaw}&lng=${lngRaw}&radius=1000&limit=50`;
+      const res = await fetch(url);
+      const text = await res.text();
+      if (!res.ok) throw new Error(text);
+      const json = JSON.parse(text);
+      const placesData = Array.isArray(json) ? json : json.data || [];
+
+      setGlobalPlaces(placesData);
+      router.push({ pathname: "./map", params: { lat: latRaw, lng: lngRaw } });
+    } catch (err: any) {
+      console.error(err);
+      alert("Erreur recherche nearby : " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={{ height: 50 }} />
@@ -107,12 +137,20 @@ export default function SearchScreen() {
               {props.phone && <Text style={styles.meta}>Tel : {props.phone}</Text>}
 
               <View style={{ height: 8 }} />
-              <Button
-                title="Voir sur la carte"
-                onPress={() => openOnMap(item)}
-                color="#6a5acd"
-                disabled={!(coords.length === 2)}
-              />
+              <View style={{ flexDirection: "row", gap: 8 }}>
+                <Button
+                  title="Map"
+                  onPress={() => openOnMap(item)}
+                  color="#6a5acd"
+                  disabled={coords.length !== 2}
+                />
+                <Button
+                  title="Aroundthis"
+                  onPress={() => searchNearby(item)}
+                  color="#2196F3"
+                  disabled={coords.length !== 2}
+                />
+              </View>
             </View>
           );
         }}

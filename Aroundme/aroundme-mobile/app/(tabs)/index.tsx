@@ -86,13 +86,13 @@ export default function HomeScreen() {
       />
 
       <Button
-        title="Préremplir avec ma position actuelle (simulée)"
+        title="Exemple de position simulée (Paris)"
         onPress={simulateMyLocation}
         color="#6a5acd"
       />
       <View style={{ height: 8 }} />
       <Button
-        title="Lancer la recherche de lieux à proximité"
+        title="Aroundme"
         onPress={() => fetchPlaces()}
         color="#2196F3"
       />
@@ -102,7 +102,7 @@ export default function HomeScreen() {
 
       {contextPlaces.length > 0 && (
         <Button
-          title="Voir sur la carte"
+          title="Voir la carte"
           color="#6a5acd"
           onPress={() => router.push({
             pathname: "./map",
